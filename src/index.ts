@@ -1,26 +1,21 @@
-import express, {Application, application} from "express"
-import bodyparser from "body-parser"
+import express, { Application, application } from "express";
 
 const port = process.env.PORT || 8080;
 
 class App {
-    constructor(
-        public app: Application = express(),
-    ){
-        this.plugins()
-        this.routes()
-    }
+  constructor(public app: Application = express()) {
+    this.plugins();
+    this.routes();
+  }
 
-    plugins(){
-        this.app.use(bodyparser.json())
-    }
+  plugins() {
+    this.app.use(express.json());
+  }
 
-    routes(){
-        
-    }
+  routes() {}
 }
 
-const app = new App().app
+const app = new App().app;
 app.listen(port, () => {
-    console.log(`Running on http://[::]:${port}`)
-})
+  console.log(`Running on http://[::]:${port}`);
+});

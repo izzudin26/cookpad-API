@@ -56,29 +56,40 @@ class CookpadService {
       );
       await page.waitForSelector("ul");
       const foodBlock = await page.$("#main_contents");
-      return foodBlock!.$$eval("ul > li.block-link", (liList) => {
-        return Promise.all(
-          liList.map((li) => {
-            let recipe: string = li.getAttribute("id")!;
-            let recipeId: string =
-              recipe.split("_")[recipe.split("_").length - 1];
-            let title: string = li.querySelector("a")!.innerText!;
-            let imageUrl: string = li
-              .querySelector(
-                "div.flex-none.w-20.xs\\:w-auto.h-auto.relative > picture > img"
-              )!
-              .getAttribute("data-original")!;
+      const foodField: food[] = await foodBlock!.$$eval(
+        "ul > li.block-link",
+        (liList) => {
+          return Promise.all(
+            liList.map((li) => {
+              let recipe: string = li.getAttribute("id")!;
+              let recipeId: string =
+                recipe.split("_")[recipe.split("_").length - 1];
+              let title: string = li.querySelector("a")!.innerText!;
+              let imageUrl: string = li
+                .querySelector(
+                  "div.flex-none.w-20.xs\\:w-auto.h-auto.relative > picture > img"
+                )!
+                .getAttribute("data-original")!;
 
-            return {
-              recipeId,
-              title,
-              imageUrl: imageUrl,
-            };
-          })
-        );
-      });
+              return {
+                recipeId,
+                title,
+                imageUrl: imageUrl,
+              };
+            })
+          );
+        }
+      );
+      await browser.close();
+      return foodField;
     } catch (error) {
       throw error;
     }
   }
 }
+
+const cook = new CookpadService();
+const getFod = async () => {
+  console.log(await cook.getFoods("api", 1));
+};
+getFod();

@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
 
 interface food {
   title: string;
@@ -6,12 +6,51 @@ interface food {
   imageUrl: string;
 }
 
+interface recipe {
+  title: string;
+  ingredements: string[];
+  steps: string[];
+}
+
 class CookpadService {
-  public async getFood(foodName: string, pageNumber: number) {
-    let listFoods: food[] = [];
+  public async getRecipe(recipeId: string): Promise<recipe> {
+    const browser = await puppeteer.launch({ headless: false });
+    const page: Page = await browser.newPage();
     try {
-      const browser = await puppeteer.launch({ headless: false });
-      const page = await browser.newPage();
+      await page.goto(`https://cookpad.com/id/resep/${recipeId}`);
+      const title: string = await page.$eval("section > h1", (titleelement) =>
+        titleelement.innerHTML.trim()
+      );
+      const ingredements: string[] = await page.$$eval(
+        ".ingredient-list > ol > li",
+        (ingredements) => {
+          return Promise.all(
+            ingredements.map((ingredement) =>
+              ingredement.querySelector("div")!.innerText.trim()
+            )
+          );
+        }
+      );
+      const steps: string[] = await page.$$eval("#steps > ol > li", (steps) => {
+        return Promise.all(
+          steps.map((step) => step.querySelector("div")!.innerText)
+        );
+      });
+      await browser.close();
+      return {
+        title,
+        ingredements,
+        steps,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async getFoods(foodName: string, pageNumber: number): Promise<food[]> {
+    const browser = await puppeteer.launch({ headless: false });
+    const page: Page = await browser.newPage();
+    try {
       await page.goto(
         `https://cookpad.com/id/cari/${foodName}?page=${pageNumber}`
       );
@@ -20,9 +59,10 @@ class CookpadService {
       return foodBlock!.$$eval("ul > li.block-link", (liList) => {
         return Promise.all(
           liList.map((li) => {
-            let recipeId: string = li.getAttribute("id")!;
+            let recipe: string = li.getAttribute("id")!;
+            let recipeId: string =
+              recipe.split("_")[recipe.split("_").length - 1];
             let title: string = li.querySelector("a")!.innerText!;
-            // const regex = /<img.*?data-original='(.*?)'/;
             let imageUrl: string = li
               .querySelector(
                 "div.flex-none.w-20.xs\\:w-auto.h-auto.relative > picture > img"
@@ -42,9 +82,3 @@ class CookpadService {
     }
   }
 }
-
-const cook = new CookpadService();
-const getFod = async () => {
-  console.log(await cook.getFood("api", 1));
-};
-getFod();

@@ -1,4 +1,5 @@
 import express, { Application, application } from "express";
+import { cookpadroute } from "./routes";
 
 const port = process.env.PORT || 8080;
 
@@ -12,7 +13,9 @@ class App {
     this.app.use(express.json());
   }
 
-  routes() {}
+  routes() {
+    this.app.use("/api", cookpadroute.router);
+  }
 }
 
 const app = new App().app;

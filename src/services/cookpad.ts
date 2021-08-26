@@ -1,13 +1,13 @@
 import puppeteer, { Page } from "puppeteer";
 import { getRandom } from "random-useragent";
 
-interface food {
+export interface food {
   title: string;
   recipeId: string;
   imageUrl: string;
 }
 
-interface recipe {
+export interface recipe {
   title: string;
   ingredements: string[];
   steps: string[];
@@ -53,6 +53,7 @@ export class CookpadService {
     const browser = await puppeteer.launch({ headless: true });
     const page: Page = await browser.newPage();
     await page.setUserAgent(getRandom()!);
+
     try {
       await page.goto(
         `https://cookpad.com/id/cari/${foodName}?page=${pageNumber}`
@@ -90,3 +91,5 @@ export class CookpadService {
     }
   }
 }
+
+export const cookpadService = new CookpadService();

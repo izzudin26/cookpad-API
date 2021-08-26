@@ -1,4 +1,5 @@
 import puppeteer, { Page } from "puppeteer";
+import { getRandom } from "random-useragent";
 
 interface food {
   title: string;
@@ -12,13 +13,14 @@ interface recipe {
   steps: string[];
 }
 
-class CookpadService {
+export class CookpadService {
   public async getRecipe(recipeId: string): Promise<recipe> {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page: Page = await browser.newPage();
+    await page.setUserAgent(getRandom()!);
     try {
       await page.goto(`https://cookpad.com/id/resep/${recipeId}`);
-      const title: string = await page.$eval("section > h1", (titleelement) =>
+      const title: string = await page.$eval("h1", (titleelement) =>
         titleelement.innerHTML.trim()
       );
       const ingredements: string[] = await page.$$eval(
@@ -48,8 +50,9 @@ class CookpadService {
   }
 
   public async getFoods(foodName: string, pageNumber: number): Promise<food[]> {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page: Page = await browser.newPage();
+    await page.setUserAgent(getRandom()!);
     try {
       await page.goto(
         `https://cookpad.com/id/cari/${foodName}?page=${pageNumber}`
@@ -87,9 +90,3 @@ class CookpadService {
     }
   }
 }
-
-const cook = new CookpadService();
-const getFod = async () => {
-  console.log(await cook.getFoods("api", 1));
-};
-getFod();

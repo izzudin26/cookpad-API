@@ -15,7 +15,10 @@ export interface recipe {
 
 export class CookpadService {
   public async getRecipe(recipeId: string): Promise<recipe> {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     const page: Page = await browser.newPage();
     await page.setUserAgent(getRandom()!);
     try {
@@ -50,7 +53,10 @@ export class CookpadService {
   }
 
   public async getFoods(foodName: string, pageNumber: number): Promise<food[]> {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     const page: Page = await browser.newPage();
     await page.setUserAgent(getRandom()!);
 

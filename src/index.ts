@@ -1,4 +1,4 @@
-import express, { Application, application } from "express";
+import express, { Application, Request, Response } from "express";
 import { cookpadroute } from "./routes";
 
 const port = process.env.PORT || 8080;
@@ -14,6 +14,9 @@ class App {
   }
 
   routes() {
+    this.app.get("/", (req: Request, res: Response) => {
+      return res.send("Server Up");
+    });
     this.app.use("/api", cookpadroute.router);
   }
 }

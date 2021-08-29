@@ -9,6 +9,7 @@ export interface food {
 
 export interface recipe {
   title: string;
+  imageUrl: string;
   ingredements: string[];
   steps: string[];
 }
@@ -25,6 +26,10 @@ export class CookpadService {
       await page.goto(`https://cookpad.com/id/resep/${recipeId}`);
       const title: string = await page.$eval("h1", (titleelement) =>
         titleelement.innerHTML.trim()
+      );
+      const imageUrl: string = await page.$eval(
+        "#recipe_image > a > div > picture > img",
+        (img) => img.getAttribute("src")!
       );
       const ingredements: string[] = await page.$$eval(
         ".ingredient-list > ol > li",
@@ -44,6 +49,7 @@ export class CookpadService {
       await browser.close();
       return {
         title,
+        imageUrl,
         ingredements,
         steps,
       };
